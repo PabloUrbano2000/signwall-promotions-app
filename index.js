@@ -1,9 +1,13 @@
 import express from "express";
-import csrf from "csurf";
-import cookieParser from "cookie-parser";
+// import csrf from "csurf";
+// import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 import fileRoutes from "./routes/file.routes.js";
 import publicRoutes from "./routes/public.routes.js";
+
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Crear la app
 const app = express();
@@ -37,7 +41,7 @@ app.use("/files", fileRoutes);
 app.use("/", publicRoutes);
 
 // Definir un puerto y arrancar el proyecto
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
     console.log("El servidor está en el puerto", PORT);
