@@ -5,7 +5,7 @@ import { marcas } from "../services/global.js";
 import { uploadFile } from "../helpers/upload-file.js";
 import { existFileAndDestroy, getDirName } from "../utils/path.js";
 import { download } from "../helpers/download-file.js";
-import config from "../config";
+import config from "../config/index.js";
 
 cloudinary.config({
     cloud_name: config.CLOUDINARY_NAME,
