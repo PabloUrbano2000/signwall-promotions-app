@@ -1,24 +1,22 @@
-export const marcas = [
+export const brands = [
     {
         id: "elcomercio",
-        nombre: "El Comercio",
-        activo: true,
+        name: "El Comercio",
+        active: true,
     },
     {
         id: "gestion",
-        nombre: "Gestión",
-        activo: true,
+        name: "Gestión",
+        active: true,
     },
     {
         id: "depor",
-        nombre: "Depor",
-        activo: true,
+        name: "Depor",
+        active: true,
     },
     {
         id: "trome",
-        nombre: "Trome",
-        activo: true,
+        name: "Trome",
+        active: true,
     },
 ];
-
-

@@ -1,10 +1,14 @@
 import path from "path";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
-import { marcas } from "../services/global.js";
-import { uploadFile } from "../helpers/upload-file.js";
+import { brands } from "../services/global.js";
 import { existFileAndDestroy, getDirName } from "../utils/path.js";
-import { download } from "../helpers/download-file.js";
+import {
+    downloadFile,
+    hasValidExtensions,
+    generateFileName,
+    uploadFile,
+} from "../helpers/files.js";
 import config from "../config/index.js";
 
 cloudinary.config({
@@ -14,31 +18,15 @@ cloudinary.config({
     secure: true,
 });
 
-const generateNameImage = (
-    files = {},
-    marca = "",
-    nombre = "",
-    hasExtension = false
-) => {
-    const { archivo } = files;
-    const nombreWithSpaces = nombre.split(" ");
-    const joinNamesWithBar = nombreWithSpaces.join("_").toLowerCase();
-    const nombreCortado = archivo.name.split(".");
-    const extension = nombreCortado[nombreCortado.length - 1];
-    return `${marca.toLowerCase()}_${joinNamesWithBar}${
-        hasExtension ? "." + extension : ""
-    }`;
-};
-
 const uploadHomepage = (req, res) => {
     try {
-        const marcasActivas = marcas.filter((marca) => marca.activo === true);
+        const activeBrands = brands.filter((brand) => brand.active === true);
         res.render("files/upload-files", {
-            pagina: "Subir imágenes",
-            descripcion:
+            page: "Subir imágenes",
+            description:
                 "Esta es la página para que subas las imágenes necesarias",
-            marcas: marcasActivas,
-            datos: {},
+            brands: activeBrands,
+            formData: {},
         });
     } catch (error) {
         res.status(500).json({
@@ -49,52 +37,61 @@ const uploadHomepage = (req, res) => {
 
 const uploadImage = async (req, res) => {
     let { nombre, marca } = req.body;
-    const marcasActivas = marcas.filter((marca) => marca.activo === true) || [];
+    const activeBrands = brands.filter((b) => b.active === true) || [];
     try {
         const { archivo } = req?.files || {};
-        let errores = [];
+        let errors = [];
         if (!nombre) {
-            errores.push({ msg: "El nombre no puede estar vacío" });
+            errors.push({ msg: "El nombre no puede estar vacío" });
         }
         if (nombre && (nombre?.length > 50 || nombre?.length < 2)) {
-            errores.push({ msg: "El nombre debe tener de 2 a 50 caracteres" });
+            errors.push({ msg: "El nombre debe tener de 2 a 50 caracteres" });
         }
         if (nombre && !/^[A-Za-z0-9\-\s]{2,50}$/.test(nombre.trim())) {
-            errores.push({ msg: "El nombre solo acepta alfanuméricos" });
+            errors.push({ msg: "El nombre solo acepta alfanuméricos" });
         }
         if (!marca) {
-            errores.push({ msg: "La marca es obligatoria" });
+            errors.push({ msg: "La marca es obligatoria" });
         } else if (marca) {
             marca = marca.trim();
-            const existBrand = marcasActivas.find(
-                (marca) => marca.nombre === marca && marca.activo === true
+            const existBrand = activeBrands.find(
+                (b) => b.name === marca && b.active === true
             );
             if (existBrand) {
-                errores.push({ msg: "La marca no se encuentra disponible" });
+                errors.push({ msg: "La marca no se encuentra disponible" });
             }
         }
         if (!archivo) {
-            errores.push({ msg: "Debe seleccionar una imagen" });
+            errors.push({ msg: "Debe seleccionar una imagen" });
+        } else {
+            const isValidFile = hasValidExtensions(archivo, [
+                "png",
+                "jpg",
+                "jpeg",
+            ]);
+            isValidFile.status !== true
+                ? errors.push({ msg: isValidFile.result })
+                : null;
         }
-        if (errores.length > 0) {
+        if (errors.length > 0) {
             return res.render("files/upload-files", {
-                pagina: "Subir imágenes",
-                descripcion:
+                page: "Subir imágenes",
+                description:
                     "Esta es la página para que subas las imágenes necesarias",
-                marcas: marcasActivas,
-                datos: {
+                brands: activeBrands,
+                formData: {
                     nombre: nombre?.trim() || "",
                     marca: marca || "",
                 },
-                errores: errores,
+                errors: errors,
             });
         }
 
         // Casteamos en minúsculas los datos
-        nombre = nombre.toLowerCase().trim();
-        marca = marca.toLowerCase().trim();
+        nombre = nombre.trim();
+        marca = marca.trim();
 
-        const fileName = generateNameImage(req.files, marca, nombre);
+        const fileName = generateFileName(archivo, marca, nombre);
 
         // Hay que borrar la imagen del servidor
         const imageNotFound = path.join(
@@ -107,79 +104,98 @@ const uploadImage = async (req, res) => {
         // En caso exista eliminamos el archivo
         existFileAndDestroy(imageNotFound);
 
-        const nombreImagen = await uploadFile(
-            req.files,
+        const uploadResponse = await uploadFile(
+            archivo,
             ["png", "jpg", "jpeg"],
             marca,
             fileName
         );
 
+        if (uploadResponse.status !== true) {
+            errors.push({ msg: uploadResponse.result });
+            return res.render("files/upload-files", {
+                page: "Subir imágenes",
+                description:
+                    "Esta es la página para que subas las imágenes necesarias",
+                brands: activeBrands,
+                formData: {
+                    nombre: nombre || "",
+                    marca: marca || "",
+                },
+                errors: errors,
+            });
+        }
+
         const restEndPoint =
-            "/files/images/" + marca + "/" + nombreImagen.split(".")[0];
+            "/files/images/" +
+            marca +
+            "/" +
+            uploadResponse.result.split(".")[0];
 
         res.render("files/upload-success", {
-            pagina: "Imagen subida con éxito!",
-            descripcion: "Puedes consumir tu imagen en el siguiente endpoint:",
+            page: "Imagen subida con éxito!",
+            description: "Puedes consumir tu imagen en el siguiente endpoint:",
             response: {
                 endpoint: restEndPoint,
             },
         });
     } catch (err) {
-        const errores = [{ msg: "Ocurrió un error inesperado" + err }];
+        const errors = [{ msg: "Ocurrió un error inesperado" + err }];
         return res.render("files/upload-files", {
-            pagina: "Subir imágenes",
-            descripcion:
+            page: "Subir imágenes",
+            description:
                 "Esta es la página para que subas las imágenes necesarias",
-            marcas: marcasActivas,
-            datos: {
+            brands: activeBrands,
+            formData: {
                 nombre: nombre?.trim() || "",
                 marca: marca || "",
             },
-            errores: errores,
+            errors: errors,
         });
     }
 };
 
 const uploadImageCloudinary = async (req, res) => {
     let { nombre, marca } = req.body;
-    const marcasActivas = marcas.filter((marca) => marca.activo === true) || [];
+    const activeBrands = brands.filter((b) => b.active === true) || [];
     try {
         const { archivo } = req?.files || {};
-        let errores = [];
+        let errors = [];
         if (!nombre) {
-            errores.push({ msg: "El nombre no puede estar vacío" });
+            errors.push({ msg: "El nombre no puede estar vacío" });
         }
         if (nombre && (nombre?.length > 50 || nombre?.length < 2)) {
-            errores.push({ msg: "El nombre debe tener de 2 a 50 caracteres" });
+            errors.push({ msg: "El nombre debe tener de 2 a 50 caracteres" });
         }
         if (nombre && !/^[A-Za-z0-9\-\s]{2,50}$/.test(nombre.trim())) {
-            errores.push({ msg: "El nombre solo acepta alfanuméricos" });
+            errors.push({ msg: "El nombre solo acepta alfanuméricos" });
         }
         if (!marca) {
-            errores.push({ msg: "La marca es obligatoria" });
+            errors.push({ msg: "La marca es obligatoria" });
         } else if (marca) {
             marca = marca.trim();
-            const existBrand = marcasActivas.find(
-                (marca) => marca.nombre === marca && marca.activo === true
+            const existBrand = activeBrands.find(
+                (b) => b.name === marca && b.active === true
             );
             if (existBrand) {
-                errores.push({ msg: "La marca no se encuentra disponible" });
+                errors.push({ msg: "La marca no se encuentra disponible" });
             }
         }
         if (!archivo) {
-            errores.push({ msg: "Debe seleccionar una imagen" });
+            errors.push({ msg: "Debe seleccionar una imagen" });
+        } else {
         }
-        if (errores.length > 0) {
+        if (errors.length > 0) {
             return res.render("files/upload-files", {
-                pagina: "Subir imágenes",
-                descripcion:
+                page: "Subir imágenes",
+                description:
                     "Esta es la página para que subas las imágenes necesarias",
-                marcas: marcasActivas,
-                datos: {
+                brands: activeBrands,
+                formData: {
                     nombre: nombre?.trim() || "",
                     marca: marca || "",
                 },
-                errores: errores,
+                errors: errors,
             });
         }
 
@@ -187,9 +203,10 @@ const uploadImageCloudinary = async (req, res) => {
         nombre = nombre.toLowerCase().trim();
         marca = marca.toLowerCase().trim();
 
-        const fileName = generateNameImage(req.files, marca, nombre);
+        const fileName = generateFileName(archivo, marca, nombre);
 
-        const { tempFilePath } = req.files.archivo;
+        const { tempFilePath } = archivo;
+
         const cloud = await cloudinary.uploader.upload(tempFilePath, {
             filename_override: fileName,
             use_filename: true,
@@ -199,38 +216,52 @@ const uploadImageCloudinary = async (req, res) => {
             unique_filename: false,
         });
 
-        const restEndPoint = "/files/images/" + marca + "/" + fileName;
-
-        const nombreImagen = await uploadFile(
-            req.files,
+        const uploadResponse = await uploadFile(
+            archivo,
             ["png", "jpg", "jpeg"],
             marca,
             fileName
         );
 
-        if (nombreImagen) {
-            console.log("subido al servidor correctamente!");
+        if (uploadResponse.status === false) {
+            errors.push({ msg: uploadResponse.result });
+            return res.render("files/upload-files", {
+                page: "Subir imágenes",
+                description:
+                    "Esta es la página para que subas las imágenes necesarias",
+                brands: activeBrands,
+                formData: {
+                    nombre: nombre?.trim() || "",
+                    marca: marca || "",
+                },
+                errors: errors,
+            });
         }
 
+        const restEndPoint = "/files/images/" + marca + "/" + fileName;
+
         res.render("files/upload-success", {
-            pagina: "Imagen subida con éxito!",
-            descripcion: "Puedes consumir tu imagen en el siguiente endpoint:",
+            page: "Imagen subida con éxito!",
+            description: "Puedes consumir tu imagen en el siguiente endpoint:",
             response: {
                 endpoint: restEndPoint,
             },
         });
     } catch (err) {
-        const errores = [{ msg: "Ocurrió un error inesperado: " + err }];
+        console.log(err);
+        const errors = [
+            { msg: "Ocurrió un error inesperado: " + err.toString() },
+        ];
         return res.render("files/upload-files", {
-            pagina: "Subir imágenes",
-            descripcion:
+            page: "Subir imágenes",
+            description:
                 "Esta es la página para que subas las imágenes necesarias",
-            marcas: marcasActivas,
-            datos: {
+            brands: activeBrands,
+            formData: {
                 nombre: nombre?.trim() || "",
                 marca: marca || "",
             },
-            errores: errores,
+            errors: errors,
         });
     }
 };
@@ -261,7 +292,7 @@ const getImage = async (req, res) => {
                 if (!fs.existsSync(pathFile)) {
                     console.log("no existe en servidor...");
                     console.log("generando archivo...");
-                    const createFile = await download(imageUrl, filename);
+                    const createFile = await downloadFile(imageUrl, filename);
                     if (createFile) {
                         console.log("archivo reconstruido exitosamente!");
                         return res.sendFile(pathFile);

@@ -1,7 +1,8 @@
 const homepage = (req, res) => {
     res.render("index", {
-        pagina: "Bienvenido",
-        descripcion: "Esta es la página para que subas las imágenes necesarias",
+        page: "BIENVENIDO!",
+        description:
+            "En esta página podrás subir las imágenes para las promociones desplegadas en PIANO, recuerda subir imágenes con responsabilidad :)",
     });
 };
 

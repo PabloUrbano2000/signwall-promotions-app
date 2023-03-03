@@ -29,7 +29,7 @@ app.use(
 );
 
 // Routing
-app.use("/files", fileRoutes);
+app.use("/files/", fileRoutes);
 app.use("/", publicRoutes);
 
 // Definir un puerto y arrancar el proyecto

@@ -1,7 +1,7 @@
 import express from "express";
 import {
     uploadHomepage,
-    uploadImage,
+    // uploadImage,
     uploadImageCloudinary,
     getImage,
 } from "../controllers/file.controller.js";

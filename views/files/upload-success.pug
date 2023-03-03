@@ -3,11 +3,11 @@ extends ../layout/main
 block contenido
     div.py-10
         include ../layout/includes/signwall-logo
-        h2.text-center.text-2xl.font-extrabold=pagina
-        h2.text-center.text-2xl.font-extrabold.mt-1=descripcion
+        h2.text-center.text-2xl.font-extrabold=page
+        h2.text-center.text-2xl.font-extrabold.mt-1=description
         div(class="font-bold w-full sm:w-auto flex")
             h4.bg-green-600.text-center.text-1xl.p-3.rounded.text-white.max-w-screen-sm.my-2.mx-auto.truncate=response.endpoint ? response.endpoint : ""
         div(class="block w-full sm:w-auto sm:flex sm:gap-4 sm:justify-center")
             if response.endpoint
-                a(href=response.endpoint ? response.endpoint : "/" target="_blank" class="py-2 px-2 bg-indigo-600 hover:bg-indigo-700 rounded font-bold uppercase cursor-pointer text-center text-white uppercase my-5 inline-block w-full sm:w-72") Revisar Imagen 
-            a(href="/" class="py-2 px-2 bg-indigo-600 hover:bg-indigo-700 rounded font-bold uppercase cursor-pointer text-center text-white uppercase my-5 inline-block w-full sm:w-72") Ir a la portada
+                a(href=response.endpoint ? response.endpoint : "/" target="_blank" class="py-2 px-2 bg-blue-900 hover:bg-slate-900 rounded font-bold uppercase cursor-pointer text-center text-white uppercase my-5 inline-block w-full sm:w-72") Ver Imagen 
+            a(href="/" class="py-2 px-2 bg-gray-700 text-center hover:bg-stone-900 rounded font-bold uppercase cursor-pointer text-white uppercase my-5 inline-block w-full sm:w-72") Ir a la portada

@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 const config = {
     CLOUDINARY_URL: process.env.CLOUDINARY_URL,
     CLOUDINARY_NAME: process.env.CLOUDINARY_NAME,
