@@ -2,7 +2,7 @@ import path from "path";
 import { v4 as uuid4 } from "uuid";
 import { getDirName } from "../utils/path.js";
 
-const subirArchivo = (
+const uploadFile = (
     files,
     extensionesValidas = ["png", "jpg", "jpeg", "gif"],
     carpeta = "",
@@ -22,9 +22,9 @@ const subirArchivo = (
         } else {
             let nombreTemp = "";
             if (!nombreArchivo) {
-                nombreTemp = uuid4() + "." + "jpg";
+                nombreTemp = uuid4() + "." + extension;
             } else {
-                nombreTemp = nombreArchivo.split(".")[0] + ".jpg";
+                nombreTemp = nombreArchivo.split(".")[0] + "." + extension;
             }
 
             const uploadPath = path.join(
@@ -46,4 +46,4 @@ const subirArchivo = (
     });
 };
 
-export { subirArchivo };
+export { uploadFile };

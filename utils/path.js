@@ -10,7 +10,6 @@ export const getDirName = () => {
 
 export const existFileAndDestroy = (pathImagen = "") => {
     if (fs.existsSync(pathImagen)) {
-        console.log("llego aqui pe");
         fs.unlinkSync(pathImagen);
     }
 };
