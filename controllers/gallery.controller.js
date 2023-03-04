@@ -1,8 +1,5 @@
-import path from "path";
-import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
 import { brands } from "../services/global.js";
-import { getDirName } from "../utils/path.js";
 import {} from "../helpers/files.js";
 import config from "../config/index.js";
 
@@ -17,15 +14,15 @@ const galleryByBrand = async (req, res) => {
     try {
         let { brand } = req.params;
         if (brand) {
+            const headerColor =
+                brands.find((b) => b.id === brand)?.color || undefined;
+
             brand = brand.toLowerCase().trim();
             const { resources = [] } = await cloudinary.search
                 .expression(`folder:${brand}`)
                 .execute();
 
             const data = [];
-
-            console.log(resources);
-
             if (resources && resources.length > 0) {
                 resources.map((img) => {
                     data.push(img);
@@ -33,21 +30,19 @@ const galleryByBrand = async (req, res) => {
 
                 return res.render("gallery/gallery-brand", {
                     page: "GALERÍA " + brand.toUpperCase(),
-                    description: "El maldy estuvo aqui",
                     count: resources.length,
+                    headerColor: headerColor,
                     data: data,
                 });
             }
 
             return res.render("gallery/gallery-brand", {
                 page: "GALERÍA " + brand.toUpperCase(),
-                description: "El maldy estuvo aqui",
                 count: 0,
+                headerColor: headerColor,
                 data: [],
             });
         }
-
-        
     } catch (err) {
         console.log(err);
         res.status(500).json({
