@@ -132,7 +132,7 @@ const uploadImage = async (req, res) => {
             "/" +
             uploadResponse.result.split(".")[0];
 
-        res.render("files/upload-success", {
+        return res.render("files/upload-success", {
             page: "Imagen subida con éxito!",
             description: "Puedes consumir tu imagen en el siguiente endpoint:",
             response: {
@@ -192,6 +192,14 @@ const uploadImageCloudinary = async (req, res) => {
         if (!archivo) {
             errors.push({ msg: "Debe seleccionar una imagen" });
         } else {
+            const isValidFile = hasValidExtensions(archivo, [
+                "png",
+                "jpg",
+                "jpeg",
+            ]);
+            isValidFile.status !== true
+                ? errors.push({ msg: isValidFile.result })
+                : null;
         }
         if (errors.length > 0) {
             return res.render("files/upload-files", {
