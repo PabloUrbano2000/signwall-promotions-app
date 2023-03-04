@@ -37,7 +37,6 @@ const hasValidExtensions = (
     file,
     validExtensions = ["png", "jpg", "jpeg", "gif"]
 ) => {
-    console.log("llego aqui");
     const shortName = file.name.split(".");
     const extension = shortName[shortName.length - 1];
 
