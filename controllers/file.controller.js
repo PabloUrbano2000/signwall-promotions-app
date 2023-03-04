@@ -143,7 +143,7 @@ const uploadImage = async (req, res) => {
         console.log(err);
         const errors = [];
         if (err.status === false) {
-            errors.push({ msg: "Ocurrió un error inesperado" + err.result });
+            errors.push({ msg: err.result });
         } else {
             errors.push({
                 msg: "Ocurrió un error inesperado",
@@ -259,7 +259,7 @@ const uploadImageCloudinary = async (req, res) => {
         console.log(err);
         const errors = [];
         if (err.status === false) {
-            errors.push({ msg: "Ocurrió un error inesperado" + err.result });
+            errors.push({ msg: err.result });
         } else {
             errors.push({
                 msg: "Ocurrió un error inesperado",
