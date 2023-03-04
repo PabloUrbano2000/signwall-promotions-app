@@ -1,0 +1,14 @@
+extends ../layout/main 
+
+block contenido
+    div.py-5
+        include ../layout/includes/signwall-logo
+        h2.text-center.text-2xl.font-extrabold=page
+        
+        div(class="bg-white shadow py-8 px-4 rounded mx-auto max-w-5xl my-10 md:px-10")
+            if data
+            div(id="container-images", class="grid gap-x-8 gap-y-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 justify-items-center")
+                each img in data
+                    a(href="/files/images/"+img.public_id, class="rounded w-full flex hover:opacity-70", target="_blank")
+                        div(id=img.public_id, class="rounded cursor-pointer flex w-full")
+                            img(src=img.secure_url, class="bg-gray-200 text-white mx-auto my-auto uppercase text-center.p-2 flex w-auto h-auto rounded shadow-2xl")

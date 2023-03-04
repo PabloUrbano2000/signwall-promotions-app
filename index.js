@@ -1,6 +1,7 @@
 import express from "express";
 import fileUpload from "express-fileupload";
 import fileRoutes from "./routes/file.routes.js";
+import galleryRoutes from "./routes/gallery.routes.js";
 import publicRoutes from "./routes/public.routes.js";
 
 import dotenv from "dotenv";
@@ -30,6 +31,7 @@ app.use(
 
 // Routing
 app.use("/files/", fileRoutes);
+app.use("/gallery/", galleryRoutes);
 app.use("/", publicRoutes);
 
 // Definir un puerto y arrancar el proyecto

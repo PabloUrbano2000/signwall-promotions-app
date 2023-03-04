@@ -1,5 +1,13 @@
 (function () {
     const inputFile = document.getElementById("archivo") || null;
+    const containerPreview = document.getElementById("container-img-preview");
+
+    if (containerPreview) {
+        containerPreview.addEventListener("click", (ev) => {
+            inputFile.click();
+        });
+    }
+
     if (inputFile) {
         inputFile.addEventListener("change", (ev) => {
             let files = ev.target.files;
