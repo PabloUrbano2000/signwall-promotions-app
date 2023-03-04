@@ -47,7 +47,7 @@ const uploadImage = async (req, res) => {
         if (nombre && (nombre?.length > 50 || nombre?.length < 2)) {
             errors.push({ msg: "El nombre debe tener de 2 a 50 caracteres" });
         }
-        if (nombre && !/^[A-Za-z0-9\-\s]{2,50}$/.test(nombre.trim())) {
+        if (nombre && !/^[A-Za-z0-9ñÑ\-\s]{2,50}$/.test(nombre.trim())) {
             errors.push({ msg: "El nombre solo acepta alfanuméricos" });
         }
         if (!marca) {
@@ -140,7 +140,15 @@ const uploadImage = async (req, res) => {
             },
         });
     } catch (err) {
-        const errors = [{ msg: "Ocurrió un error inesperado" + err }];
+        console.log(err);
+        const errors = [];
+        if (err.status === false) {
+            errors.push({ msg: "Ocurrió un error inesperado" + err.result });
+        } else {
+            errors.push({
+                msg: "Ocurrió un error inesperado",
+            });
+        }
         return res.render("files/upload-files", {
             page: "Subir imágenes",
             description:
@@ -167,7 +175,7 @@ const uploadImageCloudinary = async (req, res) => {
         if (nombre && (nombre?.length > 50 || nombre?.length < 2)) {
             errors.push({ msg: "El nombre debe tener de 2 a 50 caracteres" });
         }
-        if (nombre && !/^[A-Za-z0-9\-\s]{2,50}$/.test(nombre.trim())) {
+        if (nombre && !/^[A-Za-z0-9ñÑ\-\s]{2,50}$/.test(nombre.trim())) {
             errors.push({ msg: "El nombre solo acepta alfanuméricos" });
         }
         if (!marca) {
@@ -249,9 +257,14 @@ const uploadImageCloudinary = async (req, res) => {
         });
     } catch (err) {
         console.log(err);
-        const errors = [
-            { msg: "Ocurrió un error inesperado: " + err.toString() },
-        ];
+        const errors = [];
+        if (err.status === false) {
+            errors.push({ msg: "Ocurrió un error inesperado" + err.result });
+        } else {
+            errors.push({
+                msg: "Ocurrió un error inesperado",
+            });
+        }
         return res.render("files/upload-files", {
             page: "Subir imágenes",
             description:

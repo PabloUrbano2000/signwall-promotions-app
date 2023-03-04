@@ -7,14 +7,28 @@ import { getDirName } from "../utils/path.js";
 const generateFileName = (
     file,
     brand = "",
-    nombre = "",
+    name = "",
     hasExtension = false
 ) => {
-    const nombreWithSpaces = nombre.split(" ");
-    const joinNamesWithBar = nombreWithSpaces.join("_").toLowerCase();
+    const arrayName = name.split("");
+    let nameWithRays = "";
+    arrayName.forEach((c) => {
+        let char = c.toLowerCase();
+        if (char == "ñ") {
+            nameWithRays = nameWithRays + "ni";
+        } else if (char == " ") {
+            let arrayFilter = nameWithRays.split("");
+            if (arrayFilter[arrayFilter.length - 1] !== "_") {
+                nameWithRays = nameWithRays + "_";
+            }
+        } else {
+            nameWithRays = nameWithRays + char;
+        }
+    });
+
     const shortName = file.name.split(".");
     const extension = shortName[shortName.length - 1];
-    return `${brand.toLowerCase()}_${joinNamesWithBar}${
+    return `${brand.toLowerCase()}_${nameWithRays}${
         hasExtension ? "." + extension : ""
     }`;
 };
