@@ -1,0 +1,1 @@
+(()=>{"use strict";!function(){const t=document.getElementById("toogle-button")||null;t&&t.addEventListener("click",(t=>{console.log("llego aqui");const e=document.getElementById("toogle-list")||null;e&&(e.classList.contains("hidden")?(e.classList.remove("hidden"),e.classList.add("block")):(e.classList.remove("block"),e.classList.add("hidden")))}))}()})();

@@ -8,12 +8,15 @@ html(lang="es")
         block styles
         link(rel="stylesheet", href="/css/app.css")
         link(rel="shortcut icon", href="/logo.ico", type="image/x-icon")
-
+        link(rel="stylesheet", href="path/to/font-awesome/css/font-awesome.min.css")
+        link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css", integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg==", crossorigin="anonymous", referrerpolicy="no-referrer")
     
     body.min-h-screen.bg-gray-50
         include includes/header
 
-        main(class="mx-auto container mt-10 px-2")
+        main(class="mx-auto container mt-20 px-2 md:mt-10")
             block contenido
-        
+
+        script(src="/js/header.js")    
         block scripts
+    

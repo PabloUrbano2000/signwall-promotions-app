@@ -1,18 +1,33 @@
-header(class="bg-slate-900 p-4", style= headerColor? 'background-color:'+ headerColor + ";" : '')
-    div.container.mx-auto.flex.justify-between.items-center
-        h1.text-2xl.text-white.font-extrabold.text-center Signwall
-            span.font-normal Promociones
-
-        nav(class="my-5 text-sm md:flex md:items-center font-bold md:gap-3 text-white hidden")
-            a(href="/") Home
-            span |
-            a(href="/gallery/elcomercio/") El Comercio
-            span |
-            a(href="/gallery/gestion/") Gestión
-            span |
-            a(href="/gallery/depor/") Depor
-            span |
-            a(href="/gallery/trome/") Trome
-            span |
-            a(href="/files/") Subir imagen
-            //- a(class="bg-indigo-800 py-2 px-10 rounded-lg" href="") Cerrar Sesión
+div(class="w-full fixed top-0 md:relative" style="z-index:10;")
+    header(class="bg-slate-900 p-4", style= headerColor? 'background-color:'+ headerColor + ";" : '')
+        div.container.mx-auto.flex.justify-between.items-center.flex
+            h1.text-2xl.text-white.font-extrabold.text-center Signwall
+                span.font-normal Promociones
+            nav(class="my-5 text-sm md:flex md:items-center font-bold md:gap-3 text-white hidden")
+                a(href="/") Home
+                span |
+                a(href="/gallery/elcomercio/") El Comercio
+                span |
+                a(href="/gallery/gestion/") Gestión
+                span |
+                a(href="/gallery/depor/") Depor
+                span |
+                a(href="/gallery/trome/") Trome
+                span |
+                a(href="/files/") Subir imagen
+            button(id="toogle-button" class="w-auto text-white font-bold md:hidden")
+                i(class="fa fa-bars")
+    div(class="block w-full md:hidden" )
+        ul(id="toogle-list" class="hidden w-full uppercase text-center text-white bg-slate-900" style= headerColor? 'background-color:'+ headerColor + ";" : '')
+            li(class="nav-item p-3 cursor-pointer border-t")
+                a(href="/" class="w-full block") Home
+            li(class="p-3 cursor-pointer border-t border-stone-200 border-solid")
+                a(href="/gallery/elcomercio/" class="w-full block") El Comercio
+            li(class="p-3 cursor-pointer border-t border-stone-200 border-solid")
+                a(href="/gallery/gestion/" class="w-full block") Gestión
+            li(class="p-3 cursor-pointer border-t border-stone-200 border-solid")
+                a(href="/gallery/depor/" class="w-full block") Depor
+            li(class="p-3 cursor-pointer border-t border-stone-200 border-solid")
+                a(href="/gallery/trome/" class="w-full block") Trome
+            li(href="/files/", class="p-3 cursor-pointer border-t border-stone-200 border-solid")
+                a(href="/files/") Subir imagen
