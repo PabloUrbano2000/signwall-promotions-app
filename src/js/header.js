@@ -2,7 +2,6 @@
     const toogleButton = document.getElementById("toogle-button") || null;
     if (toogleButton) {
         toogleButton.addEventListener("click", (ev) => {
-            console.log("llego aqui");
             const navListItem = document.getElementById("toogle-list") || null;
             if (navListItem) {
                 if (navListItem.classList.contains("hidden")) {
