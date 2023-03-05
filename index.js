@@ -1,4 +1,6 @@
 import express from "express";
+import csrf from "csurf";
+import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 import fileRoutes from "./routes/file.routes.js";
 import galleryRoutes from "./routes/gallery.routes.js";
@@ -13,6 +15,12 @@ const app = express();
 
 // Habilitar lectura de datos de formularios
 app.use(express.urlencoded({ extended: true }));
+
+// Habilitar Cookie Parser
+app.use(cookieParser());
+
+// Habilitar CSRF
+app.use(csrf({ cookie: true }));
 
 // Habilitar Pug
 app.set("view engine", "pug");

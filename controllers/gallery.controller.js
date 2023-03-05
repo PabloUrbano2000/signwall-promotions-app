@@ -31,6 +31,7 @@ const galleryByBrand = async (req, res) => {
                 return res.render("gallery/gallery-brand", {
                     page: "GALERÍA " + brand.toUpperCase(),
                     count: resources.length,
+                    csrfToken: encodeURI(req.csrfToken()),
                     headerColor: headerColor,
                     data: data,
                 });
@@ -39,12 +40,13 @@ const galleryByBrand = async (req, res) => {
             return res.render("gallery/gallery-brand", {
                 page: "GALERÍA " + brand.toUpperCase(),
                 count: 0,
+                csrfToken: encodeURI(req.csrfToken()),
                 headerColor: headerColor,
                 data: [],
             });
         }
     } catch (err) {
-        console.log(err);
+        console.log('Error inesperado:', JSON.stringify(err || ""));
         res.status(500).json({
             message: "Ocurrió un error inesperado",
         });

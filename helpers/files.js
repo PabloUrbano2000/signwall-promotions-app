@@ -52,52 +52,60 @@ const hasValidExtensions = (
     };
 };
 
-const uploadFile = (
-    file,
-    validExtensions = ["png", "jpg", "jpeg", "gif"],
-    folder = "",
-    fileName = ""
-) => {
+const hasValidSize = (file, maxSize = 200000) => {
+    if (file.size > maxSize) {
+        let auxSize = maxSize;
+        let unit = "kb";
+        if (maxSize < 1000000) {
+            unit = "kb";
+            auxSize = maxSize / 1000;
+        } else {
+            unit = "mb";
+            auxSize = maxSize / 1000000;
+        }
+        return {
+            status: false,
+            result: `El archivo excede el máximo de tamaño ${auxSize}${unit}`,
+        };
+    }
+    return {
+        status: true,
+    };
+};
+
+const uploadFile = (file, folder = "", fileName = "") => {
     return new Promise((resolve, reject) => {
         const shortName = file.name.split(".");
         const extension = shortName[shortName.length - 1];
 
-        // Validar la extensión
-        if (!validExtensions.includes(extension)) {
-            reject({
-                status: false,
-                result: `La extensión ${extension} no es permitida - ${validExtensions}`,
-            });
+        let temporalName = "";
+        if (!fileName) {
+            temporalName = uuid4() + "." + extension;
         } else {
-            let temporalName = "";
-            if (!fileName) {
-                temporalName = uuid4() + "." + extension;
-            } else {
-                temporalName = fileName.split(".")[0] + "." + extension;
-            }
-
-            const uploadPath = path.join(
-                getDirName(),
-                "../uploads/",
-                folder,
-                temporalName
-            );
-
-            // sube en raiz el file
-            file.mv(uploadPath, (err) => {
-                if (err) {
-                    reject({
-                        status: false,
-                        result: err,
-                    });
-                } else {
-                    resolve({
-                        status: true,
-                        result: temporalName,
-                    });
-                }
-            });
+            temporalName = fileName.split(".")[0] + "." + extension;
         }
+
+        const uploadPath = path.join(
+            getDirName(),
+            "../uploads/",
+            folder,
+            temporalName
+        );
+
+        // sube en raiz el file
+        file.mv(uploadPath, (err) => {
+            if (err) {
+                reject({
+                    status: false,
+                    result: err,
+                });
+            } else {
+                resolve({
+                    status: true,
+                    result: temporalName,
+                });
+            }
+        });
     });
 };
 
@@ -118,4 +126,10 @@ var downloadFile = function (uri, filename) {
     });
 };
 
-export { generateFileName, uploadFile, hasValidExtensions, downloadFile };
+export {
+    generateFileName,
+    uploadFile,
+    hasValidExtensions,
+    hasValidSize,
+    downloadFile,
+};

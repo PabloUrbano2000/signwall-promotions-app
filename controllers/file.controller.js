@@ -5,11 +5,11 @@ import { brands } from "../services/global.js";
 import { existFileAndDestroy, getDirName } from "../utils/path.js";
 import {
     downloadFile,
-    hasValidExtensions,
     generateFileName,
     uploadFile,
 } from "../helpers/files.js";
 import config from "../config/index.js";
+import { validationResult } from "express-validator";
 
 cloudinary.config({
     cloud_name: config.CLOUDINARY_NAME,
@@ -20,15 +20,20 @@ cloudinary.config({
 
 const uploadHomepage = (req, res) => {
     try {
-        const activeBrands = brands.filter((brand) => brand.active === true);
-        res.render("files/upload-files", {
+        const activeBrands =
+            brands?.filter((brand) => brand?.active === true) || [];
+        let dataRender = {
             page: "Subir imágenes",
             description:
                 "Esta es la página para que subas las imágenes necesarias",
             brands: activeBrands,
+            csrfToken: encodeURI(req.csrfToken()),
             formData: {},
-        });
-    } catch (error) {
+        };
+
+        res.render("files/upload-files", dataRender);
+    } catch (err) {
+        console.log("Error inesperado:", JSON.stringify(err || ""));
         res.status(500).json({
             message: "Ocurrió un error inesperado",
         });
@@ -36,49 +41,33 @@ const uploadHomepage = (req, res) => {
 };
 
 const uploadImage = async (req, res) => {
+    const activeBrands = brands?.filter((b) => b?.active === true) || [];
+    let dataRender = {
+        page: "Subir imágenes",
+        description: "Esta es la página para que subas las imágenes necesarias",
+        page: "Esta es la página para que subas las imágenes necesarias",
+        brands: activeBrands,
+        navBrands: activeBrands,
+        formData: {},
+    };
+
     let { nombre, marca } = req.body;
-    const activeBrands = brands.filter((b) => b.active === true) || [];
+    const { archivo } = req?.files || {};
     try {
-        const { archivo } = req?.files || {};
         let errors = [];
-        if (!nombre) {
-            errors.push({ msg: "El nombre no puede estar vacío" });
+
+        const resultValidator = validationResult(req);
+        const customErrors = req.customErrors || [];
+
+        if (!resultValidator.isEmpty()) {
+            errors = resultValidator.array();
         }
-        if (nombre && (nombre?.length > 50 || nombre?.length < 2)) {
-            errors.push({ msg: "El nombre debe tener de 2 a 50 caracteres" });
-        }
-        if (nombre && !/^[A-Za-z0-9ñÑ\-\s]{2,50}$/.test(nombre.trim())) {
-            errors.push({ msg: "El nombre solo acepta alfanuméricos" });
-        }
-        if (!marca) {
-            errors.push({ msg: "La marca es obligatoria" });
-        } else if (marca) {
-            marca = marca.trim();
-            const existBrand = activeBrands.find(
-                (b) => b.name === marca && b.active === true
-            );
-            if (existBrand) {
-                errors.push({ msg: "La marca no se encuentra disponible" });
-            }
-        }
-        if (!archivo) {
-            errors.push({ msg: "Debe seleccionar una imagen" });
-        } else {
-            const isValidFile = hasValidExtensions(archivo, [
-                "png",
-                "jpg",
-                "jpeg",
-            ]);
-            isValidFile.status !== true
-                ? errors.push({ msg: isValidFile.result })
-                : null;
+        if (customErrors.length > 0) {
+            errors = [...errors, ...customErrors];
         }
         if (errors.length > 0) {
             return res.render("files/upload-files", {
-                page: "Subir imágenes",
-                description:
-                    "Esta es la página para que subas las imágenes necesarias",
-                brands: activeBrands,
+                ...dataRender,
                 formData: {
                     nombre: nombre?.trim() || "",
                     marca: marca || "",
@@ -104,27 +93,7 @@ const uploadImage = async (req, res) => {
         // En caso exista eliminamos el archivo
         existFileAndDestroy(imageNotFound);
 
-        const uploadResponse = await uploadFile(
-            archivo,
-            ["png", "jpg", "jpeg"],
-            marca,
-            fileName
-        );
-
-        if (uploadResponse.status !== true) {
-            errors.push({ msg: uploadResponse.result });
-            return res.render("files/upload-files", {
-                page: "Subir imágenes",
-                description:
-                    "Esta es la página para que subas las imágenes necesarias",
-                brands: activeBrands,
-                formData: {
-                    nombre: nombre || "",
-                    marca: marca || "",
-                },
-                errors: errors,
-            });
-        }
+        const uploadResponse = await uploadFile(archivo, marca, fileName);
 
         const restEndPoint =
             "/files/images/" +
@@ -140,7 +109,7 @@ const uploadImage = async (req, res) => {
             },
         });
     } catch (err) {
-        console.log(err);
+        console.log("Error inesperado:", JSON.stringify(err || ""));
         const errors = [];
         if (err.status === false) {
             errors.push({ msg: err.result });
@@ -150,10 +119,7 @@ const uploadImage = async (req, res) => {
             });
         }
         return res.render("files/upload-files", {
-            page: "Subir imágenes",
-            description:
-                "Esta es la página para que subas las imágenes necesarias",
-            brands: activeBrands,
+            ...dataRender,
             formData: {
                 nombre: nombre?.trim() || "",
                 marca: marca || "",
@@ -164,49 +130,35 @@ const uploadImage = async (req, res) => {
 };
 
 const uploadImageCloudinary = async (req, res) => {
+    const activeBrands = brands?.filter((b) => b?.active === true) || [];
+    let dataRender = {
+        page: "Subir imágenes",
+        description: "Esta es la página para que subas las imágenes necesarias",
+        page: "Esta es la página para que subas las imágenes necesarias",
+        brands: activeBrands,
+        navBrands: activeBrands,
+        csrfToken: encodeURI(req.csrfToken()),
+        formData: {},
+    };
+
     let { nombre, marca } = req.body;
-    const activeBrands = brands.filter((b) => b.active === true) || [];
+    const { archivo } = req?.files || {};
+
     try {
-        const { archivo } = req?.files || {};
         let errors = [];
-        if (!nombre) {
-            errors.push({ msg: "El nombre no puede estar vacío" });
+
+        const resultValidator = validationResult(req);
+        const customErrors = req.customErrors || [];
+
+        if (!resultValidator.isEmpty()) {
+            errors = resultValidator.array();
         }
-        if (nombre && (nombre?.length > 50 || nombre?.length < 2)) {
-            errors.push({ msg: "El nombre debe tener de 2 a 50 caracteres" });
-        }
-        if (nombre && !/^[A-Za-z0-9ñÑ\-\s]{2,50}$/.test(nombre.trim())) {
-            errors.push({ msg: "El nombre solo acepta alfanuméricos" });
-        }
-        if (!marca) {
-            errors.push({ msg: "La marca es obligatoria" });
-        } else if (marca) {
-            marca = marca.trim();
-            const existBrand = activeBrands.find(
-                (b) => b.name === marca && b.active === true
-            );
-            if (existBrand) {
-                errors.push({ msg: "La marca no se encuentra disponible" });
-            }
-        }
-        if (!archivo) {
-            errors.push({ msg: "Debe seleccionar una imagen" });
-        } else {
-            const isValidFile = hasValidExtensions(archivo, [
-                "png",
-                "jpg",
-                "jpeg",
-            ]);
-            isValidFile.status !== true
-                ? errors.push({ msg: isValidFile.result })
-                : null;
+        if (customErrors.length > 0) {
+            errors = [...errors, ...customErrors];
         }
         if (errors.length > 0) {
             return res.render("files/upload-files", {
-                page: "Subir imágenes",
-                description:
-                    "Esta es la página para que subas las imágenes necesarias",
-                brands: activeBrands,
+                ...dataRender,
                 formData: {
                     nombre: nombre?.trim() || "",
                     marca: marca || "",
@@ -223,7 +175,8 @@ const uploadImageCloudinary = async (req, res) => {
 
         const { tempFilePath } = archivo;
 
-        const cloud = await cloudinary.uploader.upload(tempFilePath, {
+        // subiendolo a cloudinary
+        await cloudinary.uploader.upload(tempFilePath, {
             filename_override: fileName,
             use_filename: true,
             public_id: fileName,
@@ -232,27 +185,8 @@ const uploadImageCloudinary = async (req, res) => {
             unique_filename: false,
         });
 
-        const uploadResponse = await uploadFile(
-            archivo,
-            ["png", "jpg", "jpeg"],
-            marca,
-            fileName
-        );
-
-        if (uploadResponse.status === false) {
-            errors.push({ msg: uploadResponse.result });
-            return res.render("files/upload-files", {
-                page: "Subir imágenes",
-                description:
-                    "Esta es la página para que subas las imágenes necesarias",
-                brands: activeBrands,
-                formData: {
-                    nombre: nombre?.trim() || "",
-                    marca: marca || "",
-                },
-                errors: errors,
-            });
-        }
+        // subiendo al servidor
+        await uploadFile(archivo, marca, fileName);
 
         const restEndPoint = "/files/images/" + marca + "/" + fileName;
 
@@ -264,7 +198,7 @@ const uploadImageCloudinary = async (req, res) => {
             },
         });
     } catch (err) {
-        console.log(err);
+        console.log("Error inesperado:", JSON.stringify(err || ""));
         const errors = [];
         if (err.status === false) {
             errors.push({ msg: err.result });
@@ -274,10 +208,7 @@ const uploadImageCloudinary = async (req, res) => {
             });
         }
         return res.render("files/upload-files", {
-            page: "Subir imágenes",
-            description:
-                "Esta es la página para que subas las imágenes necesarias",
-            brands: activeBrands,
+            ...dataRender,
             formData: {
                 nombre: nombre?.trim() || "",
                 marca: marca || "",
@@ -326,7 +257,7 @@ const getImage = async (req, res) => {
         const imageNotFound = path.join(getDirName(), "../assets/no-image.jpg");
         return res.sendFile(imageNotFound);
     } catch (err) {
-        console.log(err);
+        console.log("Error inesperado:", JSON.stringify(err || ""));
         res.status(500).json({
             message: "Ocurrió un error inesperado",
         });
