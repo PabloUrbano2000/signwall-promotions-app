@@ -188,15 +188,7 @@ const uploadImageCloudinary = async (req, res) => {
         // subiendo al servidor
         await uploadFile(archivo, marca, fileName);
 
-        const restEndPoint = "/files/images/" + marca + "/" + fileName;
-
-        res.render("files/upload-success", {
-            page: "Imagen subida con éxito!",
-            description: "Puedes consumir tu imagen en el siguiente endpoint:",
-            response: {
-                endpoint: restEndPoint,
-            },
-        });
+        return res.redirect("/files/success/" + fileName + "/");
     } catch (err) {
         console.log("Error inesperado:", JSON.stringify(err || ""));
         const errors = [];
@@ -264,4 +256,39 @@ const getImage = async (req, res) => {
     }
 };
 
-export { uploadHomepage, uploadImage, uploadImageCloudinary, getImage };
+const uploadSuccessPage = async (req, res) => {
+    try {
+        const { publicId } = req.params || {};
+
+        if (!publicId) {
+            res.redirect("/");
+        }
+
+        const publicIdParts = publicId.split("_");
+
+        const newPublicId = publicIdParts[0] + "/" + publicId;
+
+        const restEndPoint = "/files/images/" + newPublicId;
+
+        return res.render("files/upload-success", {
+            page: "Imagen subida con éxito!",
+            description: "Puedes consumir tu imagen en el siguiente endpoint:",
+            response: {
+                endpoint: restEndPoint,
+            },
+        });
+
+        return res.redirect("/");
+    } catch (err) {
+        console.log("Error inesperado:", JSON.stringify(err || ""));
+        return res.redirect("/");
+    }
+};
+
+export {
+    uploadHomepage,
+    uploadImage,
+    uploadImageCloudinary,
+    uploadSuccessPage,
+    getImage,
+};

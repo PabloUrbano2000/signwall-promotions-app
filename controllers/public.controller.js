@@ -15,4 +15,19 @@ const homepage = (req, res) => {
     }
 };
 
-export { homepage };
+const error404Page = (req, res) => {
+    try {
+        res.render("404", {
+            page: "Página no encontrada",
+            description: "Lo sentimos no pudimos encontrar esta página :(",
+        });
+    } catch (err) {
+        console.log("Error inesperado:", JSON.stringify(err || ""));
+        res.render("404", {
+            page: "Página no encontrada",
+            description: "Lo sentimos no pudimos encontrar esta página :(",
+        });
+    }
+};
+
+export { homepage, error404Page };

@@ -41,6 +41,7 @@ app.use(
 app.use("/files/", fileRoutes);
 app.use("/gallery/", galleryRoutes);
 app.use("/", publicRoutes);
+app.use("**/**", (req, res) => res.redirect("/404/"));
 
 // Definir un puerto y arrancar el proyecto
 const PORT = process.env.PORT || 3000;

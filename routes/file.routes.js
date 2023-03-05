@@ -2,6 +2,7 @@ import express from "express";
 import { body } from "express-validator";
 import {
     uploadHomepage,
+    uploadSuccessPage,
     // uploadImage,
     uploadImageCloudinary,
     getImage,
@@ -15,7 +16,10 @@ import { brands } from "../services/global.js";
 
 const router = express.Router();
 
+router.get("/success/:publicId", uploadSuccessPage);
+
 router.get("/images/:brand/:name", getImage);
+
 router.get("/", uploadHomepage);
 // router.post("/", uploadImage);
 
@@ -57,5 +61,9 @@ router.post(
     ],
     uploadImageCloudinary
 );
+
+router.get("**/**", (req, res) => {
+    return res.redirect("/404/");
+});
 
 export default router;

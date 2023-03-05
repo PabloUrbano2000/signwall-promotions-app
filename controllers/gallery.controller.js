@@ -1,6 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
 import { brands } from "../services/global.js";
-import {} from "../helpers/files.js";
 import config from "../config/index.js";
 
 cloudinary.config({
@@ -14,8 +13,11 @@ const galleryByBrand = async (req, res) => {
     try {
         let { brand } = req.params;
         if (brand) {
-            const headerColor =
-                brands.find((b) => b.id === brand)?.color || undefined;
+            const verifyBrand = brands.find((b) => b.id === brand) || undefined;
+
+            if (!verifyBrand) {
+                return res.redirect("/404/");
+            }
 
             brand = brand.toLowerCase().trim();
             const { resources = [] } = await cloudinary.search
@@ -32,7 +34,7 @@ const galleryByBrand = async (req, res) => {
                     page: "GALERÍA " + brand.toUpperCase(),
                     count: resources.length,
                     csrfToken: encodeURI(req.csrfToken()),
-                    headerColor: headerColor,
+                    headerColor: verifyBrand.color,
                     data: data,
                 });
             }
@@ -41,12 +43,12 @@ const galleryByBrand = async (req, res) => {
                 page: "GALERÍA " + brand.toUpperCase(),
                 count: 0,
                 csrfToken: encodeURI(req.csrfToken()),
-                headerColor: headerColor,
+                headerColor: verifyBrand.color,
                 data: [],
             });
         }
     } catch (err) {
-        console.log('Error inesperado:', JSON.stringify(err || ""));
+        console.log("Error inesperado:", JSON.stringify(err || ""));
         res.status(500).json({
             message: "Ocurrió un error inesperado",
         });
