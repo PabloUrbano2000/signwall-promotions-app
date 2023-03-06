@@ -11,7 +11,7 @@ block contenido
                     each img in data
                         a(href="/files/images/"+img.public_id, class="rounded w-full flex hover:opacity-70", target="_blank")
                             div(id=img.public_id, class="rounded cursor-pointer flex w-full")
-                                img(src=img.secure_url, class="bg-gray-200 text-white mx-auto my-auto uppercase text-center.p-2 block w-auto h-auto rounded shadow-2xl", style="max-height: 280px;")
+                                img(src=img.secure_url, class="bg-gray-200 text-white mx-auto my-auto uppercase text-center.p-2 block w-auto h-auto rounded shadow-2xl", style="max-height: 250px;")
             if data.length == 0
                 div(class="mt-5 w-full flex flex-col")
                     p(class="p-5 mx-auto font-bold text-center my-2 text-xl") Aún no se han subido imágenes...
