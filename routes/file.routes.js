@@ -57,7 +57,7 @@ router.post(
             }),
         fileExists("archivo"),
         hasValidExtensions("archivo", ["jpg", "png", "jpeg"]),
-        hasValidSize("archivo"),
+        hasValidSize("archivo", 1000000),
     ],
     uploadImageCloudinary
 );
