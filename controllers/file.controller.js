@@ -83,7 +83,7 @@ const uploadImage = async (req, res) => {
         const fileName = generateFileName(archivo, marca, nombre);
 
         // Hay que borrar la imagen del servidor
-        const imageNotFound = path.join(
+        const currentFile = path.join(
             getDirName(),
             "../uploads",
             marca,
@@ -91,7 +91,7 @@ const uploadImage = async (req, res) => {
         );
 
         // En caso exista eliminamos el archivo
-        existFileAndDestroy(imageNotFound);
+        existFileAndDestroy(currentFile);
 
         const uploadResponse = await uploadFile(archivo, marca, fileName);
 
@@ -218,6 +218,19 @@ const getImage = async (req, res) => {
             name = name.toLowerCase();
 
             const publicId = `${brand}/${name}`;
+
+            // Hay que buscar imagen en el servidor
+            let currentFile = path.join(getDirName(), "../uploads", publicId);
+
+            // En caso de que exista en servidor
+            const extensions = ["jpg", "png", "jpeg"];
+            for (let ext of extensions) {
+                const newCurrentFile = currentFile + "." + ext;
+                if (fs.existsSync(newCurrentFile)) {
+                    return res.sendFile(newCurrentFile);
+                }
+            }
+
             const { resources = [] } = await cloudinary.search
                 .expression(`public_id:${publicId}`)
                 .execute();
@@ -233,6 +246,7 @@ const getImage = async (req, res) => {
                 const filename =
                     "uploads/" + brand + "/" + getFileNameWithExtension;
                 const pathFile = path.join(getDirName(), "..", filename);
+                console.log("llego aqui", pathFile);
                 if (!fs.existsSync(pathFile)) {
                     console.log("no existe en servidor...");
                     console.log("generando archivo...");
@@ -277,8 +291,6 @@ const uploadSuccessPage = async (req, res) => {
                 endpoint: restEndPoint,
             },
         });
-
-        return res.redirect("/");
     } catch (err) {
         console.log("Error inesperado:", JSON.stringify(err || ""));
         return res.redirect("/");

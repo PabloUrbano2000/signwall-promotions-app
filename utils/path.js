@@ -8,8 +8,8 @@ export const getDirName = () => {
     return __dirname;
 };
 
-export const existFileAndDestroy = (pathImagen = "") => {
-    if (fs.existsSync(pathImagen)) {
-        fs.unlinkSync(pathImagen);
+export const existFileAndDestroy = (pathFile = "") => {
+    if (fs.existsSync(pathFile)) {
+        fs.unlinkSync(pathFile);
     }
 };
