@@ -246,7 +246,6 @@ const getImage = async (req, res) => {
                 const filename =
                     "uploads/" + brand + "/" + getFileNameWithExtension;
                 const pathFile = path.join(getDirName(), "..", filename);
-                console.log("llego aqui", pathFile);
                 if (!fs.existsSync(pathFile)) {
                     console.log("no existe en servidor...");
                     console.log("generando archivo...");
