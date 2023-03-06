@@ -3,18 +3,18 @@ div(class="w-full fixed top-0 md:relative" style="z-index:10;")
         div.container.mx-auto.flex.justify-between.items-center.flex
             h1.text-2xl.text-white.font-extrabold.text-center.py-1 Signwall
                 span.font-normal Promociones
-            nav(class="my-5 text-sm md:flex md:items-center font-bold md:gap-3 text-white hidden")
-                a(href="/") Home
-                span |
-                a(href="/gallery/elcomercio/") El Comercio
-                span |
-                a(href="/gallery/gestion/") Gestión
-                span |
-                a(href="/gallery/depor/") Depor
-                span |
-                a(href="/gallery/trome/") Trome
-                span |
-                a(href="/files/") Subir imagen
+            nav(class="my-5 text-sm md:flex md:items-center font-bold text-white hidden")
+                a(href="/", class="text-center") Home
+                span(class="mx-2 lg:mx-3") |
+                a(href="/gallery/elcomercio/" class="text-center") El Comercio
+                span(class="mx-2 lg:mx-3") |
+                a(href="/gallery/gestion/" class="text-center") Gestión
+                span(class="mx-2 lg:mx-3") |
+                a(href="/gallery/depor/" class="text-center") Depor
+                span(class="mx-2 lg:mx-3") |
+                a(href="/gallery/trome/" class="text-center") Trome
+                span(class="mx-2 lg:mx-3") |
+                a(href="/files/" class="text-center") Subir imagen
             button(id="toogle-button" class="w-auto text-white font-bold md:hidden")
                 i(class="fa fa-bars")
     div(class="block w-full md:hidden" )
@@ -30,4 +30,4 @@ div(class="w-full fixed top-0 md:relative" style="z-index:10;")
             li(class="p-3 cursor-pointer border-t border-stone-200 border-solid")
                 a(href="/gallery/trome/" class="w-full block") Trome
             li(href="/files/", class="p-3 cursor-pointer border-t border-stone-200 border-solid")
-                a(href="/files/") Subir imagen
+                a(href="/files/" class="w-full block") Subir imagen
