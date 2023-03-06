@@ -3,7 +3,6 @@ import { body } from "express-validator";
 import {
     uploadHomepage,
     uploadSuccessPage,
-    // uploadImage,
     uploadImageCloudinary,
     getImage,
 } from "../controllers/file.controller.js";
